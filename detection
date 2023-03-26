@@ -1,0 +1,31 @@
+import cv2
+import mediapipe as mp
+
+#to draw
+mpd=mp.solutions.drawing_utils
+mpp=mp.solutions.pose
+#for camera
+cap=cv2.VideoCapture(0)#change to 1 if there is external camera
+with mpp.Pose(min_detection_confidence=0.5,min_tracking_confidence=0.5) as pose:
+  while cap.isOpened():
+    ret,frame=cap.read()
+    #recolor image
+    image=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+    image.flags.writeable=False
+    #make detections
+    r=pose.process(image)
+
+    image.flags.writeable=True
+    image=cv2.cvtColor(image,cv2.COLOR_RGB2BGR)
+    print(r)
+
+ #renderdetection
+    mpd.draw_landmarks(image,r.pose_landmarks,mpp.POSE_CONNECTIONS,
+                       mpd.DrawingSpec(color=(254,120,69),thickness=2,circle_radius=2),
+                       mpd.DrawingSpec(color=(254,156,89),thickness=2,circle_radius=2)) #changecolor as your wish (255,255,255)
+
+    cv2.imshow("ars",image)
+    if cv2.waitKey(10) & 0xff==ord('q'):
+        break
+cap.release()
+cv2.destroyAllWindows()
